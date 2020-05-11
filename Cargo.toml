@@ -5,4 +5,5 @@ authors = ["Duc Thanh Tran <duc.thanh.tran.dtt@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+ndarray = "0.13.1"
 rand = "0.7.3"

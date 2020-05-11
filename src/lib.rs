@@ -1,3 +1,4 @@
+mod bernoulli;
 mod knapsack;
 
 use std::fs::File;
