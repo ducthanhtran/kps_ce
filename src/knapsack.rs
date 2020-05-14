@@ -1,7 +1,12 @@
+use std::cell::Cell;
 use std::cmp::{self, Ordering};
 
+
+thread_local!(static ITEM_ID: Cell<usize> = Cell::new(0));
+
+
 #[derive(Debug, Eq)]
-pub struct Item { value: usize, weight: usize }
+pub struct Item { id: usize, value: usize, weight: usize }
 
 impl Ord for Item {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -21,7 +26,13 @@ impl PartialEq  for Item {
     }
 }
 
-pub fn item(value: usize, weight: usize) -> Item { Item { value, weight } }
+pub fn item(value: usize, weight: usize) -> Item {
+    ITEM_ID.with(|thread_id| {
+        let id = thread_id.get();
+        thread_id.set(id + 1);
+        Item { id, value, weight}
+    })
+}
 
 #[derive(Debug)]
 pub struct UnboundedKnapsack {
@@ -124,6 +135,13 @@ pub fn lower_bound(item_with_setup: &ItemWithSetup, capacity: i32) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_item_id() {
+        let items = vec![item(5, 5), item(30, 20)];
+        assert_eq!(items[0].id, 0);
+        assert_eq!(items[1].id, 1);
+    }
 
     #[test]
     fn test_item_sort() {
